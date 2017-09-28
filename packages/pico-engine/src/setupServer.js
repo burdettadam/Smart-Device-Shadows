@@ -7,6 +7,24 @@ var version = require("../package.json").version;
 var oauth_server = require("./oauth_server");
 var mime = require("mime-types");
 
+var setupWebpack = _.noop;//don't use webpack to build on the fly in production
+if(process.env.NODE_ENV === "development"){
+    var webpack = require("webpack");
+    var webpackDev = require("webpack-dev-middleware");
+    var webpackHot = require("webpack-hot-middleware");
+    var webpackConfig = require("../webpack.config");
+
+    setupWebpack = function(app){
+        var webpackCompiler = webpack(webpackConfig);
+        app.use(webpackDev(webpackCompiler, {
+            noInfo: true,
+            publicPath: webpackConfig.output.publicPath
+        }));
+        app.use(webpackHot(webpackCompiler));
+    };
+}
+
+
 var mergeGetPost = function(req){
     //give preference to post body params
     return _.assign({}, req.query, req.body);
@@ -20,6 +38,7 @@ module.exports = function(pe){
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         next();
     });
+    setupWebpack(app);
     app.use(express.static(path.resolve(__dirname, "..", "public")));
     app.use(bodyParser.json({type: "application/json"}));
     app.use(bodyParser.urlencoded({limit: "512mb", type: "application/x-www-form-urlencoded", extended: false}));
