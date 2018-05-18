@@ -1,10 +1,8 @@
-# pico-engine
+# Smart Device Shawdow (SDS)
 
 [![Build Status](https://travis-ci.org/Picolab/pico-engine.svg)](https://travis-ci.org/Picolab/pico-engine)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/cxnk24jb697a9m5b?svg=true)](https://ci.appveyor.com/project/farskipper/pico-engine)
 [![Node version](https://img.shields.io/node/v/pico-engine.svg)](https://nodejs.org/en/download/)
-
-An implementation of the [pico-engine](http://www.windley.com/archives/2016/03/rebuilding_krl.shtml) hosted on node.js
 
 ## Getting Started / Installing / Configuration
 
@@ -12,7 +10,7 @@ See [packages/pico-engine](https://github.com/Picolab/pico-engine/tree/master/pa
 
 ## Contributing
 
-The `pico-engine` is made up of several smaller modules. Each with their own documentation and test suite.
+The `SDS` is made up of several smaller modules. Each with their own documentation and test suite.
 
 However they live in this repository in the `packages/` directory (mono-repo style using [lerna](https://github.com/lerna/lerna))
  * **pico-engine** - this is the npm package people install and use
