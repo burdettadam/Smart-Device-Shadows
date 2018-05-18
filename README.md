@@ -1,4 +1,4 @@
-# Smart Device Shawdow (SDS)
+# Smart Device Shadow (SDS)
 
 [![Build Status](https://travis-ci.org/Picolab/pico-engine.svg)](https://travis-ci.org/Picolab/pico-engine)
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/cxnk24jb697a9m5b?svg=true)](https://ci.appveyor.com/project/farskipper/pico-engine)
