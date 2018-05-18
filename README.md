@@ -1,6 +1,6 @@
 # Smart Device Shadow (SDS)
 
-[//]: # ( [![Build Status](https://travis-ci.org/Picolab/pico-engine.svg)](https://travis-ci.org/Picolab/pico-engine)
+[//]: <> ( [![Build Status](https://travis-ci.org/Picolab/pico-engine.svg)](https://travis-ci.org/Picolab/pico-engine) )
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/cxnk24jb697a9m5b?svg=true)](https://ci.appveyor.com/project/farskipper/pico-engine)
 [![Node version](https://img.shields.io/node/v/pico-engine.svg)](https://nodejs.org/en/download/) )
 
