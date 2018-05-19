@@ -25,7 +25,7 @@ However they live in this repository in the `packages/` directory (mono-repo sty
 To run the Smart-Device-Shadows in development mode do the following:
 
 ```sh
-$ git clone https://github.com/Picolab/pico-engine.git
+$ git clone https://github.com/burdettadam/Smart-Device-Shadows.git
 $ cd Smart-Device-Shadows
 $ npm run setup
 $ npm start
@@ -49,13 +49,9 @@ NOTE: When running via `npm start` the `PICO_ENGINE_HOME` will default to your c
 
 ### Making changes
 
-Use a branch (or fork) to do your work. When you are ready, create a pull request. That way we can review it before merging it into master.
+Branch it, make changes, create a pull request.  We will review it before merging it into master.
 
 View [docs/git-cheatsheet.md](https://github.com/Picolab/pico-engine/blob/master/docs/git-cheatsheet.md) for more.
 
-## Changelog
-
-To view details about versions: [CHANGELOG.md](https://github.com/Picolab/pico-engine/blob/master/CHANGELOG.md)
-
 ## License
-MIT
+MIT, GPL
