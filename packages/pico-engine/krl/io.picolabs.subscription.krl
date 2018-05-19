@@ -239,8 +239,8 @@ ent:established [
                     "Tx_verify_key": channel{"sovrin"}{"verifyKey"},
                     "Tx_public_key": channel{"sovrin"}{"encryptionPublicKey"},
                     //------------------------
-                    "status"       : "outbound" }
-          }, bus{"Tx_host"})
+                    "status"       : "outbound" })
+        }, bus{"Tx_host"})
     always {
       raise wrangler event "inbound_pending_subscription_approved" attributes event:attrs.put(["bus"],bus)
     }
