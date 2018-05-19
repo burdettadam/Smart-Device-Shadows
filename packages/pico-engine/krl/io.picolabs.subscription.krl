@@ -195,7 +195,7 @@ ent:established [
                                      {"Rx_role"      : event:attr("Tx_role"),
                                       "Tx_role"      : event:attr("Rx_role"),
                                       "Tx"           : event:attr("Rx"),
-                                      "Tx_host"      : event:attr("Rx_host") => event:attr("Rx_host") | meta:host , // send our host as Tx_host if Tx_host was provided.
+                                      "Tx_host"      : event:attr("Rx_host") => event:attr("Rx_host") | meta:host, // send our host as Tx_host if Tx_host was provided.
                                       "Tx_verify_key": event:attr("verify_key"),
                                       "Tx_public_key": event:attr("public_key")})
           }, event:attr("Tx_host")); //send event to this host if provided
@@ -232,11 +232,14 @@ ent:established [
           "eci": bus{"Tx"},
           "domain": "wrangler", "type": "outbound_pending_subscription_approved",
           "attrs": event:attrs.put({
-                    "Id"            : bus{"Id"} ,
+                    //  _____perspectives_____
+                    //  other pico | this pico
+                    "Id"           : bus{"Id"} ,
                     "Tx"           : bus{"Rx"} ,
                     "Tx_verify_key": channel{"sovrin"}{"verifyKey"},
-                    "Tx_public_key": channel{"sovrin"}{"encryptionPublicKey"}
-                    })
+                    "Tx_public_key": channel{"sovrin"}{"encryptionPublicKey"},
+                    //------------------------
+                    "status"       : "outbound" }
           }, bus{"Tx_host"})
     always {
       raise wrangler event "inbound_pending_subscription_approved" attributes event:attrs.put(["bus"],bus)
@@ -284,11 +287,7 @@ ent:established [
       event:send({
           "eci"   : bus{"Tx"},
           "domain": "wrangler", "type": "established_removal",
-          "attrs" : event:attrs.put({
-                      "Rx": bus{"Tx"}, //change perspective
-                      "Tx": bus{"Rx"}, //change perspective
-                      "Id": bus{"Id"}
-                    })
+          "attrs" : event:attrs.put({ "Id" : bus{"Id"} })
           }, Tx_host)
     fired {
       raise wrangler event "established_removal" attributes event:attrs.put("Id",bus{"Id"})
@@ -303,7 +302,7 @@ ent:established [
       index = indexOfId(buses, bus{"Id"})
     }
     if index >= 0 then
-      engine:removeChannel(bus{"Rx"}) //wrangler:removeChannel ...
+      engine:removeChannel(bus{"Rx"}) 
     fired {
       ent:established := buses.splice(index,1);
       raise wrangler event "subscription_removed" attributes event:attrs.put({ "bus" : bus }) // API event
@@ -319,9 +318,7 @@ ent:established [
     event:send({
           "eci"   : bus{"Tx"},
           "domain": "wrangler", "type": "outbound_removal",
-          "attrs" : event:attrs.put({
-                      "Id": bus{"Id"}
-                    })
+          "attrs" : event:attrs.put({ "Id": bus{"Id"} })
           }, Tx_host)
     always {
       raise wrangler event "inbound_removal" attributes event:attrs.put("Id",bus{"Id"})
@@ -351,10 +348,7 @@ ent:established [
     event:send({
           "eci"   : bus{"wellKnown_Tx"},
           "domain": "wrangler", "type": "inbound_removal",
-          "attrs" : event:attrs.put({
-                      "Id": bus{"Id"},
-                      "Tx": bus{"Rx"}
-                    })
+          "attrs" : event:attrs.put({ "Id" : bus{"Id"} })
           }, Tx_host)
     always {
       raise wrangler event "outbound_removal" attributes event:attrs.put("Id",bus{"Id"})
