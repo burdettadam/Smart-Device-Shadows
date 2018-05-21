@@ -69,7 +69,6 @@ module.exports = function(core){
             ], function(ctx, args, callback){
                 core.db.listObservers(callback);
             }),
-        },
         addResource: mkKRLaction([
                 "key","value"
             ], function(ctx, args, callback){
@@ -104,5 +103,6 @@ module.exports = function(core){
                 });
             }),
       }
+    }
   };
 
