@@ -29,7 +29,6 @@ var d = Discover({
 
 var resources = {},dids = [];
 
-// advertise the process with an object
 d.advertise({
   name: "PicoEngine",
   resources: resources
@@ -38,10 +37,10 @@ d.advertise({
 d.on('added', function(obj) {
   console.log('A new node has been added.');
   for (var i = 0; i < dids.length; i++) { 
-    //request.post(
-    //"http://localhost:8080/sky/event/"+dids[i]+"/12345/discovery/engine_found",
-    //{ json: obj },
-    //function (error, response, body) { });
+    request.post(
+    "http://localhost:8080/sky/event/"+dids[i]+"/12345/discovery/engine_found",
+    { json: obj },
+    function (error, response, body) { });
   }
 
 });
@@ -49,10 +48,10 @@ d.on('added', function(obj) {
 d.on('removed', function(obj) {
   console.log('A node has been removed.');
   for (var i = 0; i < dids.length; i++) { 
-    //request.post(
-    //"http://localhost:8080/sky/event/"+dids[i]+"/12345/discovery/engine_lost",
-    //{ json: obj  },
-    //function (error, response, body) { });
+    request.post(
+    "http://localhost:8080/sky/event/"+dids[i]+"/12345/discovery/engine_lost",
+    { json: obj  },
+    function (error, response, body) { });
   }
 });
 
@@ -72,35 +71,23 @@ module.exports = function(core){
         addResource: mkKRLaction([
                 "key","value"
             ], function(ctx, args, callback){
-                core.db.addResource(args.key,args.value, function(err){
-                    if(err && !err.notFound) return callback(err);
-                    callback(null, err ? false : true);
-                });
+                core.db.addResource(args.key,args.value,callback);
             }),
         removeResource: mkKRLaction([
-                "key"
+                "key","value"
             ], function(ctx, args, callback){
 
-                core.db.removeResource(args.key, function(err){
-                    if(err) return callback(err);
-                    callback(null, err ? false : true);
-                });
+                core.db.removeResource(args.key, args.value, callback);
             }),
         addObserver: mkKRLaction([
                 "did"
             ], function(ctx, args, callback){
-                core.db.addObserver(args.did, function(err){
-                    if(err) return callback(err);
-                    callback(null, err ? false : true);
-                });
+                core.db.addObserver(args.did,callback);
             }),
         removeObserver: mkKRLaction([
                 "did"
             ], function(ctx, args, callback){
-                core.db.removeObserver(args.did, function(err){
-                    if(err) return callback(err);
-                    callback(null, err ? false : true);
-                });
+                core.db.removeObserver(args.did,callback);
             }),
       }
     }

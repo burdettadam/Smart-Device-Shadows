@@ -269,7 +269,42 @@ module.exports = function (opts) {
   var removeMigration = function (version, callback) {
     ldb.del(['migration-log', version + ''], callback)
   }
-
+  var getArray= function(ldb,key,callback){
+    ldb.get(key, function(err, data){
+        if(err && !err.notFound) callback(err);
+        data = data || "[]";
+        var value = JSON.parse(data);
+        callback(null, value);
+    });
+  };
+  var addToArray = function(ldb,key,value,equals,callback){
+    ldb.get(key, function(err, data){
+        if(err && !err.notFound) callback(err);
+        data = data || "[]";
+        var array = JSON.parse(data);
+        var index = _.findIndex(array, equals);
+        if (index < 0) {
+            array.push(value);;
+            array = JSON.stringify(array);
+            ldb.put(key, array, callback);
+        }
+        callback(null,data);
+    });
+  };
+  var removeFromArray = function(ldb,key,value,equals,callback){
+    ldb.get(key, function(err, data){
+        if(err && !err.notFound) callback(err);
+        data = data || "[]";
+        var array = JSON.parse(data);
+        var index = _.findIndex(array, equals);
+        if (index > -1) {
+            array.splice(index, 1);
+            array = JSON.stringify(array);
+            ldb.put(key, array, callback);
+        }
+        callback();
+    });
+  };
   function newChannelBase (opts) {
     var did = genDID()
     var channel = {
@@ -753,73 +788,29 @@ module.exports = function (opts) {
       }))
     },
     getPicoStatus: getPicoStatus,
-    ////////////////////////////////////////////////////////////////////////
-    //  //
-    //  // discovery:*
-    //  //
-    //  listResources: function(callback){
-    //    getPVar(ldb, ["resources"], [], callback);
-    //    /*
-    //    ldb.get("resources", function(err, data){
-    //        if(err) callback(err);
-    //        var value = JSON.parse((data||"[]");
-    //        callback(null, value);
-    //    });*/
-    //},
-    //addResource: function(name, resource,callback){
-    //    putPVar(ldb, ["resources",name], [], resource, callback);
-    //    /*ldb.get("resources", function(err, data){
-    //        if(err) callback(err);
-    //        var value = JSON.parse(data);
-    //        value.push(Resource);
-    //        value = JSON.stringify(value);
-    //        ldb.put("resources", value, callback);
-    //    });*/
-    //},
-    //removeResource: function(res ,callback){
-    //    delPVar(ldb, ["resources", res], [], callback);
-    //    /*ldb.get("resources", function(err, data){
-    //        if(err) callback(err);
-    //        var array = JSON.parse(data);
-    //        var index = array.indexOf(res);
-    //        if (index > -1) array.splice(index, 1);
-    //        array = JSON.stringify(array);
-    //        ldb.put("resources", array, callback);
-    //    });*/
-    //},
-    //listObservers: function(callback){
-    //    getPVar(ldb, ["observers"], [], callback);
+    /*////////////////////////////////////////////////////////////////////////
     //
-    //    /*ldb.get("observers", function(err, data){
-    //        if(err) callback(err);
-    //        var value = JSON.parse(data);
-    //        callback(null, value);
-    //    });*/
-    //},
-    //addObserver: function(observer ,callback){
-    //    putPVar(ldb, ["observers",observer], [], observer, callback);
+    // discovery:*
     //
-    //    /*ldb.get("observers", function(err, data){
-    //        if(err) callback(err);
-    //        var value = JSON.parse(data);
-    //        value.push(observer);
-    //        value = JSON.stringify(value);
-    //        ldb.put("observers", value, callback);
-    //    });*/
-    //},
-    //removeObserver: function(observer ,callback){
-    //    delPVar(ldb, ["observers", observer], [], callback);
-    //    
-    //    /*ldb.get("observers", function(err, data){
-    //        if(err) callback(err);
-    //        var array = JSON.parse(data);
-    //        var index = array.indexOf(observer);
-    //        if (index > -1) array.splice(index, 1);
-    //        
-    //        array = JSON.stringify(array);
-    //        ldb.put("observers", array, callback);
-    //    });*/
-    //},
+    listResources: function(callback){
+        getArray(ldb,"resources",callback);
+    },
+    addResource: function(name, resource,callback){
+        addToArray(ldb,"resources",[name,resource],function(Item) { return Item[0] == name },callback);
+    },
+    removeResource: function(name, resource ,callback){
+        removeFromArray(ldb,"resources",[name,resource],function(Item) { return Item[0] == name },callback);
+    },
+    listObservers: function(callback){
+        getArray(ldb,"observers",callback);
+    },
+    addObserver: function(observer ,callback){
+        addToArray(ldb,"observers",observer,function(Item) { return Item == observer },callback);
+    },
+    removeObserver: function(observer ,callback){
+        removeFromArray(ldb,"observers",observer,function(Item) { return Item == observer },callback);
+    },
+    */
     /// /////////////////////////////////////////////////////////////////////
     //
     // installed rulesets
