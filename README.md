@@ -3,8 +3,6 @@ Device shadows are a persistent data structure used to represent the state of an
 Smart Device Shadows innovate on Device shadows by storing the logic for state change as part of the device shadow.
 Smart Device Shadows or SDS exist as objects inside a rules engine, the rules engine facilitates SDS life cycles, event messaging and manages SDS state by enforcing associated Rules.
 
-SDS are well suited not only for IoT but as well for [Spimes](https://en.wikipedia.org/wiki/Spime). SDS excels as a [Microservices](https://en.wikipedia.org/wiki/Microservices) architecture, with each microservice represented as SDS.
-
 ## Getting Started / Installing / Configuration
 
 See [packages/pico-engine](https://github.com/Picolab/pico-engine/tree/master/packages/pico-engine#readme)
