@@ -37,6 +37,7 @@ module.exports = function(core){
 
     d.on('added', function(obj) {
       console.log('A new node has been added.');
+      obj.discoverId = obj.id;
       core.db.listObservers(function(err,observers){
         for (var i = 0; i < observers.length; i++) { 
           request.post(
