@@ -29,7 +29,8 @@ module.exports = function(core){
     core.db.listResources(function(err,resources){
       d.advertise({
         name: "PicoEngine",
-        resources: resources
+        resources: resources,
+        _host : core.host
       });
     });
     
@@ -39,7 +40,7 @@ module.exports = function(core){
       core.db.listObservers(function(err,observers){
         for (var i = 0; i < observers.length; i++) { 
           request.post(
-          "http://localhost:8080/sky/event/"+observers[i]+"/12345/discovery/engine_found",
+          "http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_found",
           { json: obj },
           function (error, response, body) { });
         }
@@ -51,13 +52,13 @@ module.exports = function(core){
       core.db.listObservers(function(err,observers){
         for (var i = 0; i < observers.length; i++) { 
           request.post(
-          "http://localhost:8080/sky/event/"+observers[i]+"/12345/discovery/engine_lost",
+          "http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_lost",
           { json: obj  },
           function (error, response, body) { });
         }
       });
     });
-    
+
     return {
       def: {
 
