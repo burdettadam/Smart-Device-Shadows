@@ -788,29 +788,6 @@ module.exports = function (opts) {
       }))
     },
     getPicoStatus: getPicoStatus,
-    /*////////////////////////////////////////////////////////////////////////
-    //
-    // discovery:*
-    //
-    listResources: function(callback){
-        getArray(ldb,"resources",callback);
-    },
-    addResource: function(name, resource,callback){
-        addToArray(ldb,"resources",[name,resource],function(Item) { return Item[0] == name },callback);
-    },
-    removeResource: function(name, resource ,callback){
-        removeFromArray(ldb,"resources",[name,resource],function(Item) { return Item[0] == name },callback);
-    },
-    listObservers: function(callback){
-        getArray(ldb,"observers",callback);
-    },
-    addObserver: function(observer ,callback){
-        addToArray(ldb,"observers",observer,function(Item) { return Item == observer },callback);
-    },
-    removeObserver: function(observer ,callback){
-        removeFromArray(ldb,"observers",observer,function(Item) { return Item == observer },callback);
-    },
-    */
     /// /////////////////////////////////////////////////////////////////////
     //
     // installed rulesets
