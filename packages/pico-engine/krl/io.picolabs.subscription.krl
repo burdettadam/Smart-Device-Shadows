@@ -289,7 +289,7 @@ ent:established [
           "domain": "wrangler", "type": "established_removal",
           "attrs" : event:attrs.put({ "Id" : bus{"Id"} })
           }, Tx_host)
-    fired {
+    always {
       raise wrangler event "established_removal" attributes event:attrs.put("Id",bus{"Id"})
     }
   }
