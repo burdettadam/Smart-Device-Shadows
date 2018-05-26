@@ -3,6 +3,10 @@ var mkKRLfn = require("../mkKRLfn");
 var Discover = require("node-discover");
 var mkKRLaction = require("../mkKRLaction");
 
+var event = {eci   : root_eci,
+             eid   : "12345",
+             domain: "discover",
+            };
 
 module.exports = function(core){
     var d = Discover({
@@ -39,11 +43,16 @@ module.exports = function(core){
       console.log('A new node has been added.');
       obj.discoverId = obj.id;
       core.db.listObservers(function(err,observers){
-        for (var i = 0; i < observers.length; i++) { 
-          request.post(
-          "http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_found",
-          { json: obj },
-          function (error, response, body) { });
+        for (var i = 0; i < observers.length; i++) {
+          event.eci = observers[i];
+          event.type = "engine_found";
+          event.attrs = obj;
+          pe.signalEvent(event, function(err, response){ /*if(err) return errResp(res, err); */});
+
+         // request.post(
+         // "http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_found",
+         // { json: obj },
+         // function (error, response, body) { });
         }
       });
     });
@@ -52,10 +61,15 @@ module.exports = function(core){
       console.log('A node has been removed.');
       core.db.listObservers(function(err,observers){
         for (var i = 0; i < observers.length; i++) { 
-          request.post(
-          "http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_lost",
-          { json: obj  },
-          function (error, response, body) { });
+          event.eci = observers[i];
+          event.type = "engine_lost";
+          event.attrs = obj;
+          pe.signalEvent(event, function(err, response){ /*if(err) return errResp(res, err); */});
+
+          //request.post(
+          //"http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_lost",
+          //{ json: obj  },
+          //function (error, response, body) { });
         }
       });
     });
