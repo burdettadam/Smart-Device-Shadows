@@ -6,9 +6,9 @@ var mkKRLaction = require("../mkKRLaction");
 var config = {
     helloInterval: 3000, // How often to broadcast a hello packet in milliseconds
     checkInterval: 6000, // How often to to check for missing nodes in milliseconds
-    nodeTimeout: 3000, // Consider a node dead if not seen in this many milliseconds
-    //masterTimeout: 2000, // Consider a master node dead if not seen in this many milliseconds
-    //mastersRequired: 1, // The count of master processes that should always be available
+    nodeTimeout: 6000, // Consider a node dead if not seen in this many milliseconds
+    masterTimeout: 6000, // Consider a master node dead if not seen in this many milliseconds
+    mastersRequired: 0, // The count of master processes that should always be available
     //weight: Math.random(), // A number used to determine the preference for a specific process to become master. Higher numbers win.
 
     //address: '0.0.0.0', // Address to bind to
@@ -20,12 +20,11 @@ var config = {
     //algorithm: 'aes256', // Encryption algorithm for packet broadcasting (must have key to enable)
     //key: null, // Encryption key if your broadcast packets should be encrypted (null means no encryption)
 
-    //ignore: 'self', // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
-    //ignoreDataErrors: true // whether to ignore data errors including parse errors
+    ignore: 'self', // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
+    ignoreDataErrors: true // whether to ignore data errors including parse errors
     };
 
-var event = {eci   : root_eci,
-             eid   : "12345",
+var event = {eid   : "12345",
              domain: "discover",
             };
 
@@ -33,7 +32,7 @@ module.exports = function(core){
 
     var d;
     function startD(config,d){
-      
+
       d = Discover(config);
 
       core.db.listResources(function(err,resources){
