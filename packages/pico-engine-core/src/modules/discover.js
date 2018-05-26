@@ -52,7 +52,7 @@ module.exports = function(core){
             event.eci = observers[i];
             event.type = "engine_found";
             event.attrs = obj;
-            pe.signalEvent(event, function(err, response){ /*if(err) return errResp(res, err); */});
+            core.signalEvent(event, function(err, response){ /*if(err) return errResp(res, err); */});
 
            // request.post(
            // "http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_found",
@@ -69,7 +69,7 @@ module.exports = function(core){
             event.eci = observers[i];
             event.type = "engine_lost";
             event.attrs = obj;
-            pe.signalEvent(event, function(err, response){ /*if(err) return errResp(res, err); */});
+            core.signalEvent(event, function(err, response){ /*if(err) return errResp(res, err); */});
 
             //request.post(
             //"http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_lost",
