@@ -3,6 +3,21 @@ var mkKRLfn = require("../mkKRLfn");
 var Discover = require("node-discover");
 var mkKRLaction = require("../mkKRLaction");
 
+// find ip taken from https://gist.github.com/szalishchuk/9054346
+var address                          // Local ip address that we're trying to calculate
+    ,os = require('os')              // Provides a few basic operating-system related utility functions (built-in)
+    ,ifaces = os.networkInterfaces();// Network interfaces
+function getIp(ifaces){
+  for (var dev in ifaces) { // Iterate over interfaces ...
+    var iface = ifaces[dev].filter(function(details) { // ... and find the one that matches the criteria
+        return details.family === 'IPv4' && details.internal === false;
+    });
+    if(iface.length > 0) address = iface[0].address;
+  }
+  return address
+}
+
+
 var config = {
     helloInterval: 3000, // How often to broadcast a hello packet in milliseconds
     checkInterval: 6000, // How often to to check for missing nodes in milliseconds
@@ -39,7 +54,7 @@ module.exports = function(core){
         d.advertise({
           name: "PicoEngine",
           resources: resources,
-          _host : core.host
+          _host : core.host//"http://"+getIp(ifaces)+core.port//core.host
         });
       });
       
