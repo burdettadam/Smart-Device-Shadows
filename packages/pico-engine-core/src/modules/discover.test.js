@@ -15,7 +15,6 @@ var testPE = function(test_name, genfn){
     });
 };
 
-
-testPE("discover:addR", function*(t, pe){
-// TODO, tests.  
+// TODO, create tests.
+testPE("discover:addResource", function*(t, pe){
 });

@@ -1,11 +1,11 @@
-ruleset discover {
+ruleset com.SMS.observer {
   meta {
-    shares __testing, resources, observers
+    shares __testing, resources, observers,engines
     use module io.picolabs.subscription alias subscription
     use module io.picolabs.wrangler alias wrangler
   }
   global {
-    __testing = { "queries": [ { "name": "__testing" },{ "name": "observers" },{ "name": "resources" } ],
+    __testing = { "queries": [ { "name": "__testing" },{ "name": "observers" },{ "name": "resources" },{ "name": "engines" } ],
                   "events": [ 
                   { "domain": "discover", "type": "addResource","attrs": [ "name" ] },
                   { "domain": "discover", "type": "removeResource","attrs": [ "name" ] },
@@ -24,7 +24,9 @@ ruleset discover {
       }, host = optionalHost.klog("_host"))
     }
   }
-
+  engines = function(){
+    discover:engines();
+  }
   observers = function(){
     discover:observers();
   }
@@ -51,7 +53,7 @@ ruleset discover {
     
   }
   
-  rule create_observer_DID{
+  rule create_observer_DID{// ruleset constructor
     select when wrangler ruleset_added where rids >< meta:rid
     pre{ channel = observerDid() }
     if(channel.isnull() || channel{"type"} != "discover") then every{
@@ -60,14 +62,27 @@ ruleset discover {
                         name      = "observer", 
                         type      = "discover", 
                         policy_id = __observer_Policy{"id"}) setting(channel)
+      discover:addObserver(channel{"id"});
     }
     fired{
       raise wrangler event "observer_created" attributes event:attrs;
       ent:observer_Policy := __observer_Policy;
-      discover:addObserver(channel{"id"});
     }
     else{
       raise wrangler event "observer_not_created" attributes event:attrs; //exists
+    }
+  }
+
+  rule remove_observer_DID{// ruleset destructor 
+    select when wrangler removing_rulesets where rids >< meta:rid
+    pre{ channel = observerDid() }
+    if(channel && channel{"type"} == "discover") then every{
+      // depending on wrangler to remove the channel.
+      discover:removeObserver(channel{"id"});
+    }
+    fired{
+      raise wrangler event "observer_deleted" attributes event:attrs;
+      raise discover event "engine_lost" attributes event:attrs; // remove all subscriptions
     }
   }
 
@@ -77,18 +92,18 @@ ruleset discover {
                             subscription:wellKnown_Rx(){"id"}, 
                             event:attr("_host"));
   }
-/* example of how to use resource_found
+// example of how to use resource_found
   rule engine_found{
     select when discover engine_found where advertisement{"resources"} >< "Temperature" 
-      pre{ attrs = {resource : event:attr("advertisement"){"resources"}{"Temperature"},
-                   _host    : event:attr("advertisement"){"_host"}
+      pre{ attrs = {"resource" : event:attr("advertisement"){"resources"}{"Temperature"},
+                   "_host"    : event:attr("advertisement"){"_host"}
                } 
       }
       always{
         raise discover event "resource_found" attributes attrs;
       }
   }
-*/
+
   rule new_resource {
     select when wrangler subscription_added
     if event:attr("engine_Id") then noop();
@@ -123,12 +138,12 @@ ruleset discover {
 
   rule addObserver {
     select when discover addObserver
-      discover:addObserver(meta:eci);
+      discover:addObserver(observerDid(){"id"});
   }
   
   rule removeObserver {
     select when discover removeObserver
-      discover:removeObserver(meta:eci);
+      discover:removeObserver(observerDid(){"id"});
   }
 
   //Accept the incoming subscription requests from other sensors.

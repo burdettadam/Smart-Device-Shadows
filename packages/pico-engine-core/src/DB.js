@@ -284,7 +284,7 @@ module.exports = function (opts) {
         var array = JSON.parse(data);
         var index = _.findIndex(array, equals);
         if (index < 0) {
-            array.push(value);;
+            array.push(value);
             array = JSON.stringify(array);
             ldb.put(key, array, callback);
         }

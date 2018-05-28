@@ -37,6 +37,8 @@ ruleset io.picolabs.wrangler {
                                 "attrs": [ "eci" ] },
                               { "domain": "wrangler", "type": "install_rulesets_requested",
                                 "attrs": [ "rids" ] },
+                              { "domain": "wrangler", "type": "uninstall_rulesets_requested",
+                                "attrs": [ "rids" ] },
                               { "domain": "wrangler", "type": "deletion_requested",
                                 "attrs": [ ] } ] }
 // ********************************************************************************************
@@ -363,8 +365,8 @@ ruleset io.picolabs.wrangler {
       send_directive("rulesets installed", { "rids": rids{"rids"} });
     }
     fired {
-      raise wrangler event "ruleset_added"
-        attributes event:attrs.put(["rids"], rids{"rids"});
+      raise wrangler event "ruleset_added" // api event for constructors
+        attributes event:attrs.put({"rids": rid_list});
     }
     else {
       error info "could not install rids: no valid rids provided";
@@ -377,18 +379,31 @@ ruleset io.picolabs.wrangler {
       
     }
   }
-
-  rule uninstallRulesets {
+  
+  rule intent_to_uninstallRulesets {
     select when wrangler uninstall_rulesets_requested
     pre {
       rids = event:attr("rids").defaultsTo("")
+      rid_list = rids.typeof() ==  "array" => rids | rids.split(re#;#)
+    } 
+    always{
+      raise wrangler event "removing_rulesets"// api event for destructors 
+        attributes event:attrs.put({"rids": rid_list});
+      schedule wrangler event "remove_rulesets" at time:add(time:now(), {"seconds": 0.5})
+        attributes event:attrs.put({"rids": rid_list});
+    }
+  }
+
+  rule uninstallRulesets {
+    select when wrangler remove_rulesets
+    pre {
+      rids = event:attr("rids").defaultsTo("")// redundant code 
       rid_list = rids.typeof() ==  "array" => rids | rids.split(re#;#)
     } every{
       uninstallRulesets(rid_list)
       send_directive("rulesets uninstalled", {"rids":rid_list});
     }
   }
-
 // ********************************************************************************************
 // ***                                      Channels                                        ***
 // ********************************************************************************************

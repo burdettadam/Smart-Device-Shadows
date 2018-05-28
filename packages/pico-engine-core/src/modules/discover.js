@@ -1,20 +1,20 @@
-var request = require('request');
 var mkKRLfn = require("../mkKRLfn");
 var Discover = require("node-discover");
 var mkKRLaction = require("../mkKRLaction");
 
 // find ip taken from https://gist.github.com/szalishchuk/9054346
-var address                          // Local ip address that we're trying to calculate
-    ,os = require('os')              // Provides a few basic operating-system related utility functions (built-in)
-    ,ifaces = os.networkInterfaces();// Network interfaces
-function getIp(ifaces){
-  for (var dev in ifaces) { // Iterate over interfaces ...
-    var iface = ifaces[dev].filter(function(details) { // ... and find the one that matches the criteria
-        return details.family === 'IPv4' && details.internal === false;
-    });
-    if(iface.length > 0) address = iface[0].address;
-  }
-  return address
+var address // Local ip address that we're trying to calculate
+    , os = require("os") // Provides a few basic operating-system related utility functions (built-in)
+    ,
+    ifaces = os.networkInterfaces(); // Network interfaces
+function getIp(ifaces) {
+    for (var dev in ifaces) { // Iterate over interfaces ...
+        var iface = ifaces[dev].filter(function(details) { // ... and find the one that matches the criteria
+            return details.family === "IPv4" && details.internal === false;
+        });
+        if (iface.length > 0) address = iface[0].address;
+    }
+    return address;
 }
 
 
@@ -35,103 +35,102 @@ var config = {
     //algorithm: 'aes256', // Encryption algorithm for packet broadcasting (must have key to enable)
     //key: null, // Encryption key if your broadcast packets should be encrypted (null means no encryption)
 
-    ignore: 'self', // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
+    ignore: "self", // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
     ignoreDataErrors: true // whether to ignore data errors including parse errors
-    };
+};
 
-var event = {eid   : "12345",
-             domain: "discover",
-            };
+var event = {
+    eid: "12345",
+    domain: "discover",
+};
 
-module.exports = function(core){
+module.exports = function(core) {
 
-    var d;
-    function startD(config,d){
+    var d, getNodes;
 
-      d = Discover(config);
+    function startD(config, d) {
 
-      core.db.listResources(function(err,resources){
-        d.advertise({
-          name: "PicoEngine",
-          resources: resources,
-          _host : core.host//"http://"+getIp(ifaces)+core.port//core.host
+        d = Discover(config);
+        var port = core.port || "8080";
+        core.db.listResources(function(err, resources) {
+            d.advertise({
+                name: "PicoEngine",
+                resources: resources,
+                _host: "http://" + getIp(ifaces) + ":" + port //core.host
+            });
         });
-      });
-      
 
-      d.on('added', function(obj) {
-        console.log('A new node has been added.');
-        obj.discoverId = obj.id;
-        core.db.listObservers(function(err,observers){
-          for (var i = 0; i < observers.length; i++) {
-            event.eci = observers[i];
-            event.type = "engine_found";
-            event.attrs = obj;
-            core.signalEvent(event, function(err, response){ /*if(err) return errResp(res, err); */});
-
-           // request.post(
-           // "http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_found",
-           // { json: obj },
-           // function (error, response, body) { });
-          }
+        d.on("added", function(obj) {
+            console.log("A new node has been added.");
+            obj.discoverId = obj.id;
+            core.db.listObservers(function(err, observers) {
+                for (var i = 0; i < observers.length; i++) {
+                    event.eci = observers[i];
+                    event.type = "engine_found";
+                    event.attrs = obj;
+                    core.signalEvent(event, function(err, response) { /*if(err) return errResp(res, err); */ });
+                }
+            });
         });
-      });
 
-      d.on('removed', function(obj) {
-        console.log('A node has been removed.');
-        core.db.listObservers(function(err,observers){
-          for (var i = 0; i < observers.length; i++) { 
-            event.eci = observers[i];
-            event.type = "engine_lost";
-            event.attrs = obj;
-            core.signalEvent(event, function(err, response){ /*if(err) return errResp(res, err); */});
-
-            //request.post(
-            //"http://localhost:8080/sky/event/"+observers[i]+"/12345/discover/engine_lost",
-            //{ json: obj  },
-            //function (error, response, body) { });
-          }
+        d.on("removed", function(obj) {
+            console.log("A node has been removed.");
+            core.db.listObservers(function(err, observers) {
+                for (var i = 0; i < observers.length; i++) {
+                    event.eci = observers[i];
+                    event.type = "engine_lost";
+                    event.attrs = obj;
+                    core.signalEvent(event, function(err, response) { /*if(err) return errResp(res, err); */ });
+                }
+            });
         });
-      });
+
+        getNodes = function() {
+            var nodes = [];
+            console.log("discover", d);
+            d.eachNode(function(node) {
+                nodes.push(node);
+            });
+            return nodes;
+        };
+
     }
 
-    setTimeout(startD, 7000, config, d);// start discover service after engine starts
+    setTimeout(startD, 7000, config, d); // start discover service after engine starts
 
 
 
     return {
-      def: {
-
-        resources: mkKRLfn([
-            ], function(ctx, args, callback){
+        def: {
+            engines: mkKRLfn([], function(ctx, args, callback) {
+                callback(null, getNodes());
+            }),
+            resources: mkKRLfn([], function(ctx, args, callback) {
                 core.db.listResources(callback);
             }),
-        observers: mkKRLfn([
-            ], function(ctx, args, callback){
+            observers: mkKRLfn([], function(ctx, args, callback) {
                 core.db.listObservers(callback);
             }),
-        addResource: mkKRLaction([
-                "key","value"
-            ], function(ctx, args, callback){
-                core.db.addResource(args.key,args.value,callback);
+            addResource: mkKRLaction([
+                "key", "value"
+            ], function(ctx, args, callback) {
+                core.db.addResource(args.key, args.value, callback);
             }),
-        removeResource: mkKRLaction([
-                "key","value"
-            ], function(ctx, args, callback){
-
+            removeResource: mkKRLaction([
+                "key", "value"
+            ], function(ctx, args, callback) {
                 core.db.removeResource(args.key, args.value, callback);
             }),
-        addObserver: mkKRLaction([
+            addObserver: mkKRLaction([
                 "did"
-            ], function(ctx, args, callback){
-                core.db.addObserver(args.did,callback);
+            ], function(ctx, args, callback) {
+                core.db.addObserver(args.did, callback);
             }),
-        removeObserver: mkKRLaction([
+            removeObserver: mkKRLaction([
                 "did"
-            ], function(ctx, args, callback){
-                core.db.removeObserver(args.did,callback);
+            ], function(ctx, args, callback) {
+                core.db.removeObserver(args.did, callback);
             }),
-      }
-    }
-  };
-
+        }
+    };
+};
