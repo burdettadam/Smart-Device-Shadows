@@ -10,7 +10,8 @@ ruleset com.SMS.observer {
                   { "domain": "discover", "type": "addResource","attrs": [ "name" ] },
                   { "domain": "discover", "type": "removeResource","attrs": [ "name" ] },
                   { "domain": "discover", "type": "addObserver","attrs": [] },
-                      { "domain": "discover", "type": "removeObserver","attrs": [] } ] }
+                  { "domain": "discover", "type": "clear_events","attrs": [] },
+                  { "domain": "discover", "type": "removeObserver","attrs": [] } ] }
   
   initiate_subscription = defaction(eci, wellKnown, optionalHost){
     every{
@@ -24,12 +25,20 @@ ruleset com.SMS.observer {
       }, host = optionalHost.klog("_host"))
     }
   }
+
+  lostEngines = function(){
+    engines = engines().keys().head();
+    ent:engine_ids_2_subs_ids.keys().difference(engines);
+  }
+
   engines = function(){
     discover:engines();
   }
+
   observers = function(){
     discover:observers();
   }
+
   resources = function(){
     discover:resources();
   }
@@ -52,7 +61,13 @@ ruleset com.SMS.observer {
     }
     
   }
-  
+
+  rule _clear{ // clear all scheduled events and ...
+    select when discover clear_events
+    foreach schedule:list() setting (_event)
+      schedule:remove(_event{"id"})
+  }
+
   rule create_observer_DID{// ruleset constructor
     select when wrangler ruleset_added where rids >< meta:rid
     pre{ channel = observerDid() }
@@ -67,6 +82,8 @@ ruleset com.SMS.observer {
     fired{
       raise wrangler event "observer_created" attributes event:attrs;
       ent:observer_Policy := __observer_Policy;
+      schedule discover event "clean_up" repeat "*/5 * * * *" attributes {} setting(foo);
+      ent:scheduledEvent := foo;
     }
     else{
       raise wrangler event "observer_not_created" attributes event:attrs; //exists
@@ -79,10 +96,11 @@ ruleset com.SMS.observer {
     if(channel && channel{"type"} == "discover") then every{
       // depending on wrangler to remove the channel.
       discover:removeObserver(channel{"id"});
+      schedule:remove(ent:scheduledEvent); // remove repeated clean up event
     }
-    fired{
-      raise wrangler event "observer_deleted" attributes event:attrs;
-      raise discover event "engine_lost" attributes event:attrs; // remove all subscriptions
+    always{
+      raise wrangler event "observer_removed" attributes event:attrs;// api
+      raise discover event "remove_subs" attributes event:attrs; // clean up subscriptions
     }
   }
 
@@ -92,6 +110,7 @@ ruleset com.SMS.observer {
                             subscription:wellKnown_Rx(){"id"}, 
                             event:attr("_host"));
   }
+
 // example of how to use resource_found
   rule engine_found{
     select when discover engine_found where advertisement{"resources"} >< "Temperature" 
@@ -123,6 +142,23 @@ ruleset com.SMS.observer {
     always{
       raise wrangler event "subscription_cancellation" attributes event:attrs.put("Id",id);
       ent:engine_ids_2_subs_ids := ent:engine_ids_2_subs_ids.delete([event:attr("id")]) on final;
+    }
+  }
+
+  rule remove_subs{
+    select when discover remove_subs
+    foreach ent:engine_ids_2_subs_ids setting(subs)
+      foreach subs setting(subId)
+        always{
+          raise wrangler event "subscription_cancellation" attributes event:attrs.put("Id",subId);
+        }
+  }
+
+  rule clean_up{
+    select when discover clean_up
+    foreach lostEngines() setting(id)
+    always{
+      raise discover event "engine_lost" attributes {"id":id};
     }
   }
 

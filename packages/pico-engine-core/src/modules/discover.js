@@ -61,7 +61,7 @@ module.exports = function(core) {
         });
 
         d.on("added", function(obj) {
-            console.log("A new node has been added.");
+            //console.log("A new node has been added.");
             obj.discoverId = obj.id;
             core.db.listObservers(function(err, observers) {
                 for (var i = 0; i < observers.length; i++) {
@@ -74,7 +74,7 @@ module.exports = function(core) {
         });
 
         d.on("removed", function(obj) {
-            console.log("A node has been removed.");
+            //console.log("A node has been removed.");
             core.db.listObservers(function(err, observers) {
                 for (var i = 0; i < observers.length; i++) {
                     event.eci = observers[i];
@@ -87,7 +87,6 @@ module.exports = function(core) {
 
         getNodes = function() {
             var nodes = [];
-            console.log("discover", d);
             d.eachNode(function(node) {
                 nodes.push(node);
             });

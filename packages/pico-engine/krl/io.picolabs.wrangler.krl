@@ -390,14 +390,14 @@ ruleset io.picolabs.wrangler {
       raise wrangler event "removing_rulesets"// api event for destructors 
         attributes event:attrs.put({"rids": rid_list});
       schedule wrangler event "remove_rulesets" at time:add(time:now(), {"seconds": 0.5})
-        attributes event:attrs.put({"rids": rid_list});
+        attributes event:attrs;
     }
   }
 
   rule uninstallRulesets {
     select when wrangler remove_rulesets
     pre {
-      rids = event:attr("rids").defaultsTo("")// redundant code 
+      rids = event:attr("rids").defaultsTo("") 
       rid_list = rids.typeof() ==  "array" => rids | rids.split(re#;#)
     } every{
       uninstallRulesets(rid_list)
