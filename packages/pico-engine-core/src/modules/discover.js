@@ -26,7 +26,7 @@ var config = {
     mastersRequired: 0, // The count of master processes that should always be available
     //weight: Math.random(), // A number used to determine the preference for a specific process to become master. Higher numbers win.
 
-    //address: '0.0.0.0', // Address to bind to
+    address: '0.0.0.0', // Address to bind to
     port: 8183, // Port on which to bind and communicate with other node-discovery processes
     //broadcast: '255.255.255.255', // Broadcast address if using broadcast
     //multicast: null, // Multicast address if using multicast (don't use multicast, use broadcast)
