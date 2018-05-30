@@ -62,7 +62,7 @@ ruleset com.SMS.observer {
     
   }
 
-  rule _clear{ // clear all scheduled events and ...
+  rule _clear{ // clear all scheduled events and ... for testing.
     select when discover clear_events
     foreach schedule:list() setting (_event)
       schedule:remove(_event{"id"})
@@ -83,7 +83,7 @@ ruleset com.SMS.observer {
       raise wrangler event "observer_created" attributes event:attrs;
       ent:observer_Policy := __observer_Policy;
       schedule discover event "clean_up" repeat "*/5 * * * *" attributes {} setting(foo);
-      ent:scheduledEvent := foo;
+      ent:scheduledEvent := foo.klog("scheduled event");
     }
     else{
       raise wrangler event "observer_not_created" attributes event:attrs; //exists
@@ -94,7 +94,7 @@ ruleset com.SMS.observer {
     select when wrangler removing_rulesets where rids >< meta:rid
     pre{ channel = observerDid() }
     if(channel && channel{"type"} == "discover") then every{
-      // depending on wrangler to remove the channel.
+      engine:removeChannel(channel{"id"}); 
       discover:removeObserver(channel{"id"});
       schedule:remove(ent:scheduledEvent); // remove repeated clean up event
     }
