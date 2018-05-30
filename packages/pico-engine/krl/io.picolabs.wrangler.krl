@@ -610,7 +610,7 @@ ruleset io.picolabs.wrangler {
     every{
       send_directive("notifying child of intent to kill", {"child": child});
       event:send({  "eci": child{"eci"}, "eid": 88,
-                    "domain": "pico", "type": "intent_to_orphan",
+                    "domain": "wrangler", "type": "intent_to_orphan",
                     "attrs": event:attrs });
     }
     always{

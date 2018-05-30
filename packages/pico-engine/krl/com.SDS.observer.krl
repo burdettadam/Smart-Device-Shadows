@@ -92,6 +92,7 @@ ruleset com.SMS.observer {
 
   rule remove_observer_DID{// ruleset destructor 
     select when wrangler removing_rulesets where rids >< meta:rid
+    or wrangler intent_to_orphan
     pre{ channel = observerDid() }
     if(channel && channel{"type"} == "discover") then every{
       engine:removeChannel(channel{"id"}); 
