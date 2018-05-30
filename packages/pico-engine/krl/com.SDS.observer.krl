@@ -1,4 +1,4 @@
-ruleset com.SMS.observer {
+ruleset com.SDS.observer {
   meta {
     shares __testing, resources, observers,engines
     use module io.picolabs.subscription alias subscription
