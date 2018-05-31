@@ -107,9 +107,15 @@ ruleset com.SDS.observer {
 
   rule resource_found{
     select when discover resource_found
-      initiate_subscription(event:attr("resource"), 
-                            subscription:wellKnown_Rx(){"id"}, 
-                            event:attr("_host"));
+      //initiate_subscription(event:attr("resource"), 
+      //                      subscription:wellKnown_Rx(){"id"}, 
+      //                      event:attr("_host"));
+      always{
+        raise wrangler event "subscription" attributes {
+                 "wellKnown_Tx": wellKnown, 
+                 "Tx_host"     : meta:host,
+                 "engine_Id"   : event:attr("id") } 
+      }
   }
 
 // example of how to use resource_found
