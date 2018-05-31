@@ -116,7 +116,7 @@ ruleset com.SDS.observer {
   rule engine_found{
     select when discover engine_found where advertisement{"resources"} >< "Temperature" 
       pre{ attrs = {"resource" : event:attr("advertisement"){"resources"}{"Temperature"},
-                   "_host"    : event:attr("advertisement"){"_host"}
+                   "_host"    : "http://"+event:attr("address")+":8080"//event:attr("advertisement"){"_host"}
                } 
       }
       always{
