@@ -121,7 +121,7 @@ ruleset com.SDS.observer {
 // example of how to use resource_found
   rule engine_found{
     select when discover engine_found where advertisement{"resources"} >< "Temperature" 
-      pre{ attrs = event:attrs().put({"resource" : event:attr("advertisement"){"resources"}{"Temperature"},
+      pre{ attrs = event:attrs.put({"resource" : event:attr("advertisement"){"resources"}{"Temperature"},
                    "_host"    : "http://"+event:attr("address")+":8080"//event:attr("advertisement"){"_host"}
                })
       }
@@ -133,13 +133,13 @@ ruleset com.SDS.observer {
   rule new_resource {
     select when wrangler subscription_added
     if event:attr("engine_Id") then noop();
+      discover:addObserver(meta:eci);  
     fired {
       ent:engine_ids_2_subs_ids := ent:engine_ids_2_subs_ids.defaultsTo({}) 
                 .put(event:attr("engine_Id"),
                     ent:engine_ids_2_subs_ids{event:attr("engine_Id")}.defaultsTo([])
                     .append(event:attr("Id"))
                 );
-      discover:addObserver(meta:eci);  
     }
   }
   
