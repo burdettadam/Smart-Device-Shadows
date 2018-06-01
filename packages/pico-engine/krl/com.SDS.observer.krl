@@ -112,8 +112,8 @@ ruleset com.SDS.observer {
       //                      event:attr("_host"));
       always{
         raise wrangler event "subscription" attributes {
-                 "wellKnown_Tx": wellKnown, 
-                 "Tx_host"     : meta:host,
+                 "wellKnown_Tx": event:attr("resource"), 
+                 "Tx_host"     : event:attr("_host"),
                  "engine_Id"   : event:attr("id") } 
       }
   }
@@ -121,9 +121,9 @@ ruleset com.SDS.observer {
 // example of how to use resource_found
   rule engine_found{
     select when discover engine_found where advertisement{"resources"} >< "Temperature" 
-      pre{ attrs = {"resource" : event:attr("advertisement"){"resources"}{"Temperature"},
+      pre{ attrs = event:attrs().put({"resource" : event:attr("advertisement"){"resources"}{"Temperature"},
                    "_host"    : "http://"+event:attr("address")+":8080"//event:attr("advertisement"){"_host"}
-               } 
+               })
       }
       always{
         raise discover event "resource_found" attributes attrs;
