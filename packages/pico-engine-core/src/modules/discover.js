@@ -101,6 +101,9 @@ module.exports = function(core) {
 
     return {
         def: {
+            ip: mkKRLfn([], function(ctx, args, callback) {
+                callback(null, getIp(ifaces));
+            }),
             engines: mkKRLfn([], function(ctx, args, callback) {
                 callback(null, getNodes());
             }),

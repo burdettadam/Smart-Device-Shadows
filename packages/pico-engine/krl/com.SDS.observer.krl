@@ -113,7 +113,8 @@ ruleset com.SDS.observer {
       always{
         raise wrangler event "subscription" attributes {
                  "wellKnown_Tx": event:attr("resource"), 
-                 "Tx_host"     : event:attr("_host"),
+                 "Tx_host"     : event:attr("Tx_host"),
+                 "Rx_host"     : "http://"+discover:ip()+":8080";,
                  "engine_Id"   : event:attr("id") } 
       }
   }
@@ -122,7 +123,7 @@ ruleset com.SDS.observer {
   rule engine_found{
     select when discover engine_found where advertisement{"resources"} >< "Temperature" 
       pre{ attrs = event:attrs.put({"resource" : event:attr("advertisement"){"resources"}{"Temperature"},
-                   "_host"    : "http://"+event:attr("address")+":8080"//event:attr("advertisement"){"_host"}
+                   "Tx_host"    : "http://"+event:attr("address")+":8080"//event:attr("advertisement"){"_host"}
                })
       }
       always{
