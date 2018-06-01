@@ -114,7 +114,7 @@ ruleset com.SDS.observer {
         raise wrangler event "subscription" attributes {
                  "wellKnown_Tx": event:attr("resource"), 
                  "Tx_host"     : event:attr("Tx_host"),
-                 "Rx_host"     : "http://"+discover:ip()+":8080";,
+                 "Rx_host"     : "http://"+discover:ip()+":8080",
                  "engine_Id"   : event:attr("id") } 
       }
   }
