@@ -132,7 +132,7 @@ ruleset com.SDS.observer {
 
   rule new_resource {
     select when wrangler subscription_added
-    if event:attr("engine_Id") then noop();
+    if event:attr("engine_Id") then
       discover:addObserver(meta:eci);  
     fired {
       ent:engine_ids_2_subs_ids := ent:engine_ids_2_subs_ids.defaultsTo({}) 
