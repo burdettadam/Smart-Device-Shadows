@@ -163,7 +163,8 @@ ruleset com.SDS.observer {
   }
 
   rule clean_up{
-    select when discover clean_up
+    select when discover clean_up or
+    discover engine_found 
     foreach lostEngines() setting(id)
     always{
       raise discover event "engine_lost" attributes {"id":id};
