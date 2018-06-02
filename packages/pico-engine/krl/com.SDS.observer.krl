@@ -12,7 +12,7 @@ ruleset com.SDS.observer {
                   { "domain": "discover", "type": "addObserver","attrs": [] },
                   { "domain": "discover", "type": "clear_events","attrs": [] },
                   { "domain": "discover", "type": "removeObserver","attrs": [] } ] }
-  
+  /*
   initiate_subscription = defaction(eci, wellKnown, optionalHost){
     every{
       event:send({
@@ -24,8 +24,9 @@ ruleset com.SDS.observer {
                  "engine_Id"   : event:attr("id") } 
       }, host = optionalHost.klog("_host"))
     }
-  }
+  }*/
 
+  
   lostEngines = function(){
     engines = engines().keys().head();
     ent:engine_ids_2_subs_ids.keys().difference(engines);

@@ -6,8 +6,8 @@ ruleset io.picolabs.subscription {
     >>
     author "Tedrub Modulus"
     use module io.picolabs.wrangler alias wrangler
-    provides established, outbound, inbound, wellKnown_Rx, autoAcceptConfig, __testing
-    shares   established, outbound, inbound, wellKnown_Rx, autoAcceptConfig, __testing
+    provides established, outbound, inbound, wellKnown_Rx, autoAcceptConfig, available, __testing
+    shares   established, outbound, inbound, wellKnown_Rx, autoAcceptConfig, available, __testing
     logging on
   }
 
@@ -80,6 +80,9 @@ ent:established [
               {"domain": "wrangler", "type": "inbound_removal"}
           ]
       }
+    }
+    available = function(){
+      true
     }
     autoAcceptConfig = function(){
       ent:autoAcceptConfig.defaultsTo({})
