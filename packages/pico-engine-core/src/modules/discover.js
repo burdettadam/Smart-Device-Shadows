@@ -22,7 +22,7 @@ function getIp(ifaces) {
 
 var config = {
     helloInterval: 1000, // How often to broadcast a hello packet in milliseconds
-    checkInterval: 6000, // How often to to check for missing nodes in milliseconds
+    checkInterval: 3000, // How often to to check for missing nodes in milliseconds
     nodeTimeout: 6000, // Consider a node dead if not seen in this many milliseconds
     masterTimeout: 6000, // Consider a master node dead if not seen in this many milliseconds
     mastersRequired: 0, // The count of master processes that should always be available
