@@ -21,11 +21,11 @@ function getIp(ifaces) {
 
 
 var config = {
-    helloInterval: 1000, // How often to broadcast a hello packet in milliseconds
-    checkInterval: 3000, // How often to to check for missing nodes in milliseconds
-    nodeTimeout: 6000, // Consider a node dead if not seen in this many milliseconds
+    helloInterval: 500, // How often to broadcast a hello packet in milliseconds
+    checkInterval: 2000, // How often to to check for missing nodes in milliseconds
+    nodeTimeout: 3000, // Consider a node dead if not seen in this many milliseconds
     masterTimeout: 6000, // Consider a master node dead if not seen in this many milliseconds
-    mastersRequired: 0, // The count of master processes that should always be available
+    mastersRequired: 1, // The count of master processes that should always be available
     //weight: Math.random(), // A number used to determine the preference for a specific process to become master. Higher numbers win.
 
     //address: '0.0.0.0', // Address to bind to
@@ -38,7 +38,7 @@ var config = {
     //key: null, // Encryption key if your broadcast packets should be encrypted (null means no encryption)
 
     //ignore: "self", // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
-    ignoreDataErrors: true // whether to ignore data errors including parse errors
+    //ignoreDataErrors: true // whether to ignore data errors including parse errors
 };
 
 var event = {
