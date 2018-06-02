@@ -21,7 +21,7 @@ function getIp(ifaces) {
 
 
 var config = {
-    helloInterval: 3000, // How often to broadcast a hello packet in milliseconds
+    helloInterval: 1000, // How often to broadcast a hello packet in milliseconds
     checkInterval: 6000, // How often to to check for missing nodes in milliseconds
     nodeTimeout: 6000, // Consider a node dead if not seen in this many milliseconds
     masterTimeout: 6000, // Consider a master node dead if not seen in this many milliseconds
@@ -37,7 +37,7 @@ var config = {
     //algorithm: 'aes256', // Encryption algorithm for packet broadcasting (must have key to enable)
     //key: null, // Encryption key if your broadcast packets should be encrypted (null means no encryption)
 
-    ignore: "self", // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
+    //ignore: "self", // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
     ignoreDataErrors: true // whether to ignore data errors including parse errors
 };
 
