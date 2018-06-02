@@ -1,6 +1,8 @@
+var tcpp = require("tcp-ping");
 var mkKRLfn = require("../mkKRLfn");
 var Discover = require("node-discover");
 var mkKRLaction = require("../mkKRLaction");
+
 
 // find ip taken from https://gist.github.com/szalishchuk/9054346
 var address // Local ip address that we're trying to calculate
@@ -26,7 +28,7 @@ var config = {
     mastersRequired: 0, // The count of master processes that should always be available
     //weight: Math.random(), // A number used to determine the preference for a specific process to become master. Higher numbers win.
 
-    address: '0.0.0.0', // Address to bind to
+    //address: '0.0.0.0', // Address to bind to
     port: 8183, // Port on which to bind and communicate with other node-discovery processes
     //broadcast: '255.255.255.255', // Broadcast address if using broadcast
     //multicast: null, // Multicast address if using multicast (don't use multicast, use broadcast)
@@ -98,9 +100,13 @@ module.exports = function(core) {
     setTimeout(startD, 7000, config, d); // start discover service after engine starts
 
 
-
     return {
         def: {
+            alive: mkKRLfn([
+                "ip","port"
+            ], function(ctx, args, callback) {
+              tcpp.probe(args.ip, args.port, function(err, available) { callback(null, available); });
+            }),
             ip: mkKRLfn([], function(ctx, args, callback) {
                 callback(null, getIp(ifaces));
             }),
