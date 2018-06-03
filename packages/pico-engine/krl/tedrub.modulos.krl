@@ -1,4 +1,4 @@
-ruleset com.SDS.observer {
+ruleset tedrub.modulos.observer {
   meta {
     shares __testing, resources, observers,engines
     use module io.picolabs.subscription alias subscription
@@ -12,20 +12,6 @@ ruleset com.SDS.observer {
                   { "domain": "discover", "type": "addObserver","attrs": [] },
                   { "domain": "discover", "type": "clear_events","attrs": [] },
                   { "domain": "discover", "type": "removeObserver","attrs": [] } ] }
-  /*
-  initiate_subscription = defaction(eci, wellKnown, optionalHost){
-    every{
-      event:send({
-        "eci": eci, "eid": "subscription",
-        "domain": "wrangler", "type": "subscription",
-        "attrs": {
-                 "wellKnown_Tx": wellKnown, 
-                 "Tx_host"     : meta:host,
-                 "engine_Id"   : event:attr("id") } 
-      }, host = optionalHost.klog("_host"))
-    }
-  }*/
-
   
   lostEngines = function(){
     engines = engines().keys().head();
@@ -78,17 +64,14 @@ ruleset com.SDS.observer {
                         name      = "observer", 
                         type      = "discover", 
                         policy_id = __observer_Policy{"id"}) setting(channel)
-      //discover:addObserver(channel{"id"});
     }
     fired{
       raise wrangler event "addObserver" attributes event:attrs;
-      raise wrangler event "observer_created" attributes event:attrs;
       ent:observer_Policy := __observer_Policy;
-      schedule discover event "clean_up" repeat "*/5 * * * *" attributes {} setting(foo);
-      ent:scheduledEvent := foo.klog("scheduled event");
     }
     else{
       raise wrangler event "observer_not_created" attributes event:attrs; //exists
+      raise wrangler event "addObserver" attributes event:attrs;
     }
   }
 
@@ -99,7 +82,6 @@ ruleset com.SDS.observer {
     if(channel && channel{"type"} == "discover") then every{
       engine:removeChannel(channel{"id"}); 
       discover:removeObserver(channel{"id"});
-      schedule:remove(ent:scheduledEvent); // remove repeated clean up event
     }
     always{
       raise wrangler event "observer_removed" attributes event:attrs;// api
@@ -109,9 +91,6 @@ ruleset com.SDS.observer {
 
   rule resource_found{
     select when discover resource_found
-      //initiate_subscription(event:attr("resource"), 
-      //                      subscription:wellKnown_Rx(){"id"}, 
-      //                      event:attr("_host"));
       always{
         raise wrangler event "subscription" attributes {
                  "wellKnown_Tx": event:attr("resource"), 
@@ -166,7 +145,8 @@ ruleset com.SDS.observer {
 
   rule clean_up{
     select when discover clean_up or
-    discover engine_found 
+    discover engine_found or
+    system online
     foreach lostEngines() setting(id)
     always{
       raise discover event "engine_lost" attributes {"id":id};
@@ -184,10 +164,11 @@ ruleset com.SDS.observer {
   }
 
   rule addObserver {
-    select when discover addObserver
+    select when discover addObserver or
+    system online 
       discover:addObserver(observerDid(){"id"});
   }
-  
+
   rule addedObserver {
     select when discover addObserver
     foreach discover:engines().values() setting(engine)

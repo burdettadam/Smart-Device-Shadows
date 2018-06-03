@@ -48,7 +48,7 @@ var event = {
 
 module.exports = function(core) {
 
-    var d, getNodes;
+    var d, getNodes = function() { return [];};
 
     function startD(config, d) {
 
@@ -58,7 +58,7 @@ module.exports = function(core) {
             d.advertise({
                 name: "PicoEngine",
                 resources: resources,
-                _host: "http://" + getIp(ifaces) + ":" + port //core.host
+                //_host: "http://" + getIp(ifaces) + ":" + port //core.host
             });
         });
 

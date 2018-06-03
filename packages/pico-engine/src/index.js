@@ -26,7 +26,16 @@ module.exports = function (conf) {
       throw err
     }
     var app = setupServer(pe)
-
+    //signal engine started
+    pe.getRootECI(function(error,root_eci){
+      pe.signalEvent({
+        eid: "12345",
+        eci: root_eci,
+        domain: "system",
+        type:"online",
+        attrs:{}
+      }, function(err, response) { /*if(err) return errResp(res, err); */ });
+    });    
     app.listen(conf.port, function () {
       console.log(conf.host)
       bunyanLog.info('HTTP server listening on port ' + conf.port)
