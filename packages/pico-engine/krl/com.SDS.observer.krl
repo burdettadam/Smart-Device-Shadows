@@ -78,9 +78,10 @@ ruleset com.SDS.observer {
                         name      = "observer", 
                         type      = "discover", 
                         policy_id = __observer_Policy{"id"}) setting(channel)
-      discover:addObserver(channel{"id"});
+      //discover:addObserver(channel{"id"});
     }
     fired{
+      raise wrangler event "addObserver" attributes event:attrs;
       raise wrangler event "observer_created" attributes event:attrs;
       ent:observer_Policy := __observer_Policy;
       schedule discover event "clean_up" repeat "*/5 * * * *" attributes {} setting(foo);
@@ -187,6 +188,14 @@ ruleset com.SDS.observer {
       discover:addObserver(observerDid(){"id"});
   }
   
+  rule addedObserver {
+    select when discover addObserver
+    foreach discover:engines().values() setting(engine)
+    always{
+      raise discover event "engine_found" attributes engine
+    }
+  }
+
   rule removeObserver {
     select when discover removeObserver
       discover:removeObserver(observerDid(){"id"});
