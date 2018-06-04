@@ -36,7 +36,7 @@ var config = {
 
     //algorithm: 'aes256', // Encryption algorithm for packet broadcasting (must have key to enable)
     //key: null, // Encryption key if your broadcast packets should be encrypted (null means no encryption)
-
+    ignoreInstance: false,
     //ignore: "self", // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
     //ignoreDataErrors: true // whether to ignore data errors including parse errors
 };
