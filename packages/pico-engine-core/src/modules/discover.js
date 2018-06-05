@@ -5,7 +5,7 @@ var mkKRLfn = require("../mkKRLfn");
 var Discover = require("node-discover");
 var mkKRLaction = require("../mkKRLaction");
 
-var hostname = os.hostname();
+//var hostname = os.hostname();
 // find ip taken from https://gist.github.com/szalishchuk/9054346
 var address, // Local ip address that we're trying to calculate
     ifaces = os.networkInterfaces(); // Network interfaces
@@ -36,8 +36,8 @@ var config = {
 
     //algorithm: 'aes256', // Encryption algorithm for packet broadcasting (must have key to enable)
     //key: null, // Encryption key if your broadcast packets should be encrypted (null means no encryption)
-    ignoreProcess: false,
-    ignoreInstance: false,
+    //ignoreProcess: false,
+    ignoreInstance: false
 };
 
 var event = {
@@ -47,7 +47,7 @@ var event = {
 
 module.exports = function(core) {
 
-    var d, getNodes = function() { return [];}, getSelf = function(){return {};};
+    var d, getNodes = function() { return [];};
 
     function startD(config, d) {
 
@@ -92,12 +92,6 @@ module.exports = function(core) {
             });
             return nodes;
         };
-
-        getSelf = function(){
-            var nodes = getNodes();
-            var index = _.findIndex(nodes, function(node) { return node["hostName"] == hostname });
-            return nodes[index];
-        };
     }
 
 
@@ -112,11 +106,9 @@ module.exports = function(core) {
               tcpp.probe(args.ip, args.port, function(err, available) { callback(null, available); });
             }),
             ip: mkKRLfn([], function(ctx, args, callback) {
-                //callback(null, getSelf()["address"]);
                 callback(null, getIp(ifaces));
             }),
             engines: mkKRLfn([], function(ctx, args, callback) {
-                //console.log("self",getSelf());
                 callback(null, getNodes());
             }),
             resources: mkKRLfn([], function(ctx, args, callback) {
