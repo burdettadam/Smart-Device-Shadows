@@ -1,13 +1,13 @@
+var _ = require("lodash");
+var os = require("os");
 var tcpp = require("tcp-ping");
 var mkKRLfn = require("../mkKRLfn");
 var Discover = require("node-discover");
 var mkKRLaction = require("../mkKRLaction");
 
-
+var hostname = os.hostname();
 // find ip taken from https://gist.github.com/szalishchuk/9054346
-var address // Local ip address that we're trying to calculate
-    , os = require("os") // Provides a few basic operating-system related utility functions (built-in)
-    ,
+var address, // Local ip address that we're trying to calculate
     ifaces = os.networkInterfaces(); // Network interfaces
 function getIp(ifaces) {
     for (var dev in ifaces) { // Iterate over interfaces ...
@@ -36,9 +36,8 @@ var config = {
 
     //algorithm: 'aes256', // Encryption algorithm for packet broadcasting (must have key to enable)
     //key: null, // Encryption key if your broadcast packets should be encrypted (null means no encryption)
+    ignoreProcess: false,
     ignoreInstance: false,
-    //ignore: "self", // Which packets to ignore: 'self' means ignore packets from this instance, 'process' means ignore packets from this process
-    //ignoreDataErrors: true // whether to ignore data errors including parse errors
 };
 
 var event = {
@@ -48,7 +47,7 @@ var event = {
 
 module.exports = function(core) {
 
-    var d, getNodes = function() { return [];};
+    var d, getNodes = function() { return [];}, getSelf = function(){return {};};
 
     function startD(config, d) {
 
@@ -58,12 +57,11 @@ module.exports = function(core) {
             d.advertise({
                 name: "PicoEngine",
                 resources: resources,
-                //_host: "http://" + getIp(ifaces) + ":" + port //core.host
+                //Rx_host: "http://" + getSelf["address"] + ":" + port //core.host
             });
         });
 
         d.on("added", function(obj) {
-            //console.log("A new node has been added.");
             obj.discoverId = obj.id;
             core.db.listObservers(function(err, observers) {
                 for (var i = 0; i < observers.length; i++) {
@@ -95,7 +93,13 @@ module.exports = function(core) {
             return nodes;
         };
 
+        getSelf = function(){
+            var nodes = getNodes();
+            var index = _.findIndex(nodes, function(node) { return node["hostName"] == hostname });
+            return nodes[index];
+        };
     }
+
 
     setTimeout(startD, 7000, config, d); // start discover service after engine starts
 
@@ -108,9 +112,11 @@ module.exports = function(core) {
               tcpp.probe(args.ip, args.port, function(err, available) { callback(null, available); });
             }),
             ip: mkKRLfn([], function(ctx, args, callback) {
+                //callback(null, getSelf()["address"]);
                 callback(null, getIp(ifaces));
             }),
             engines: mkKRLfn([], function(ctx, args, callback) {
+                //console.log("self",getSelf());
                 callback(null, getNodes());
             }),
             resources: mkKRLfn([], function(ctx, args, callback) {
